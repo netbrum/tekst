@@ -1,6 +1,7 @@
 mod buffer;
 
 use crate::{args::Args, Error, Result};
+use colored::Colorize;
 
 use buffer::Buffer;
 use notify_debouncer_mini::{new_debouncer, notify::RecursiveMode, DebouncedEvent};
@@ -65,19 +66,35 @@ impl Viewer {
                 .entry(path.clone())
                 .or_insert(Buffer::new(&path)?);
 
+            let old = buffer.data.clone();
+
             let contents = buffer.contents()?;
-            Self::print(&contents);
+            buffer.data = contents;
+
+            if self.args.diff {
+                Self::print_diff(&old, &buffer.data);
+            } else {
+                Self::print(&buffer.data);
+            }
         }
 
         Ok(())
     }
 
-    fn print(content: &str) {
-        for line in content.lines() {
-            println!("{line}");
-        }
+    fn print_diff(old: &str, new: &str) {
+        for diff in diff::lines(old, new) {
+            let result = match diff {
+                diff::Result::Left(l) => format!("-{l}").bright_red(),
+                diff::Result::Both(l, _) => l.normal(),
+                diff::Result::Right(r) => format!("+{r}").bright_green(),
+            };
 
-        println!();
+            println!("{result}");
+        }
+    }
+
+    fn print(data: &str) {
+        println!("{data}");
     }
 }
 
