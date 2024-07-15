@@ -8,16 +8,23 @@ use std::{
 
 pub struct Buffer {
     path: PathBuf,
+    pub data: String,
 }
 
 impl Buffer {
-    pub fn new(path: &Path) -> Self {
-        Self {
+    pub fn new(path: &Path) -> Result<Self> {
+        let mut file = File::open(path)?;
+
+        let mut data = String::new();
+        file.read_to_string(&mut data)?;
+
+        Ok(Self {
             path: path.to_path_buf(),
-        }
+            data,
+        })
     }
 
-    pub fn contents(&mut self) -> Result<String> {
+    pub fn contents(&self) -> Result<String> {
         let mut file = File::open(&self.path)?;
 
         let mut data = String::new();
@@ -33,7 +40,7 @@ mod tests {
 
     #[test]
     fn has_contents() -> Result<()> {
-        let mut buffer = Buffer::new(&PathBuf::from(file!()));
+        let buffer = Buffer::new(&PathBuf::from(file!()))?;
         let contents = buffer.contents()?;
 
         assert!(!contents.is_empty());

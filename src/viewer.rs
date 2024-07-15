@@ -63,7 +63,7 @@ impl Viewer {
             let buffer = self
                 .buffers
                 .entry(path.clone())
-                .or_insert(Buffer::new(&path));
+                .or_insert(Buffer::new(&path)?);
 
             let contents = buffer.contents()?;
             Self::print(&contents);
