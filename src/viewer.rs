@@ -30,7 +30,7 @@ impl Viewer {
     }
 
     pub fn run(&mut self) -> Result<()> {
-        let (sender, reciever) = mpsc::channel();
+        let (sender, receiver) = mpsc::channel();
 
         let duration = Duration::from_millis(self.args.debounce as u64);
         let mut debouncer = new_debouncer(duration, sender)?;
@@ -40,7 +40,7 @@ impl Viewer {
 
         debouncer.watcher().watch(dir, RecursiveMode::Recursive)?;
 
-        for mut events in reciever.iter().flatten() {
+        for mut events in receiver.iter().flatten() {
             if self.watch_path.is_file() {
                 events.retain(|event| event.path == self.watch_path);
             }
