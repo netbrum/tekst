@@ -45,7 +45,9 @@ impl Viewer {
                 events.retain(|event| event.path == self.watch_path);
             }
 
-            self.handle(events)?;
+            if !events.is_empty() {
+                self.handle(events)?;
+            }
         }
 
         Ok(())
