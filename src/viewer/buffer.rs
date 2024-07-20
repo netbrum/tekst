@@ -8,7 +8,7 @@ use std::{
 
 pub struct Buffer {
     path: PathBuf,
-    pub data: String,
+    data: String,
 }
 
 impl Buffer {
@@ -24,13 +24,19 @@ impl Buffer {
         })
     }
 
-    pub fn contents(&self) -> Result<String> {
+    pub fn data(&self) -> &str {
+        &self.data
+    }
+
+    pub fn refresh(&mut self) -> Result<()> {
         let mut file = File::open(&self.path)?;
 
         let mut data = String::new();
         file.read_to_string(&mut data)?;
 
-        Ok(data)
+        self.data = data;
+
+        Ok(())
     }
 }
 
@@ -39,11 +45,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn has_contents() -> Result<()> {
+    fn has_data() -> Result<()> {
         let buffer = Buffer::new(&PathBuf::from(file!()))?;
-        let contents = buffer.contents()?;
+        let data = buffer.data();
 
-        assert!(!contents.is_empty());
+        assert!(!data.is_empty());
 
         Ok(())
     }

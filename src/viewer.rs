@@ -68,15 +68,16 @@ impl Viewer {
                 .entry(path.clone())
                 .or_insert(Buffer::new(&path)?);
 
-            let old = buffer.data.clone();
+            let old = buffer.data().to_string();
 
-            let contents = buffer.contents()?;
-            buffer.data = contents;
+            buffer.refresh()?;
+
+            let data = buffer.data();
 
             if self.args.diff {
-                Self::print_diff(&old, &buffer.data);
+                Self::print_diff(&old, data);
             } else {
-                Self::print(&buffer.data);
+                Self::print(data);
             }
         }
 
