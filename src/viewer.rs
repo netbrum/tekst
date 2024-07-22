@@ -1,18 +1,12 @@
 mod buffer;
 
-use crate::{args::Args, Error, Result};
+use crate::{args::Args, terminal::Terminal, Error, Result};
 use colored::Colorize;
-use crossterm::{
-    cursor::MoveTo,
-    terminal::{Clear, ClearType},
-    ExecutableCommand,
-};
 
 use buffer::Buffer;
 use notify_debouncer_mini::{new_debouncer, notify::RecursiveMode, DebouncedEvent};
 use std::{
     collections::HashMap,
-    io,
     path::{Path, PathBuf},
     sync::mpsc,
     time::Duration,
@@ -68,10 +62,7 @@ impl Viewer {
     }
 
     fn handle(&mut self, events: Vec<DebouncedEvent>) -> Result<()> {
-        let mut stdout = io::stdout();
-
-        stdout.execute(Clear(ClearType::All))?;
-        stdout.execute(MoveTo(0, 0))?;
+        Terminal::reset()?;
 
         for DebouncedEvent { path, .. } in events {
             let buffer = self

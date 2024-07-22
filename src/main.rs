@@ -1,5 +1,6 @@
 mod args;
 mod error;
+mod terminal;
 mod viewer;
 
 pub use self::error::{Error, Result};
