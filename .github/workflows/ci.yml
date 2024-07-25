@@ -1,0 +1,38 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  
+jobs:
+  style:
+    name: Check formatting and spelling
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check format
+      run: cargo fmt --check
+      
+    - name: Run typos
+      run: cargo install typos-cli && typos
+      
+  tests:
+    name: Run clippy and tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run clippy
+      run: cargo clippy --verbose
+    
+    - name: Run tests
+      run: cargo test --verbose
+      
+    - name: Build
+      run: cargo build --verbose
