@@ -107,6 +107,7 @@ impl Viewer {
 mod tests {
     use super::*;
     use clap::Parser;
+    use notify_debouncer_mini::DebouncedEventKind;
 
     type Error = Box<dyn std::error::Error>;
     type Result<T> = std::result::Result<T, Error>;
@@ -126,6 +127,20 @@ mod tests {
         let viewer = Viewer::new(args(file!())?);
 
         assert!(viewer.is_ok());
+
+        Ok(())
+    }
+
+    #[test]
+    fn handles_event() -> Result<()> {
+        let mut viewer = Viewer::new(args(file!())?)?;
+
+        let event = DebouncedEvent {
+            path: PathBuf::from(file!()),
+            kind: DebouncedEventKind::Any,
+        };
+
+        assert!(viewer.handle(vec![event]).is_ok());
 
         Ok(())
     }

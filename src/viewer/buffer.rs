@@ -53,4 +53,13 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn can_refresh() -> Result<()> {
+        let mut buffer = Buffer::new(&PathBuf::from(file!()))?;
+
+        assert!(buffer.refresh().is_ok());
+
+        Ok(())
+    }
 }
