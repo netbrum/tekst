@@ -10,19 +10,19 @@ use std::{
     time::Duration,
 };
 
-pub struct Viewer {
+pub struct Watcher {
     buffers: HashMap<PathBuf, Buffer>,
-    watch_path: PathBuf,
+    path: PathBuf,
     args: Args,
 }
 
-impl Viewer {
+impl Watcher {
     pub fn new(args: Args) -> Result<Self> {
         debug_assert!(args.path.exists());
 
         Ok(Self {
             buffers: HashMap::default(),
-            watch_path: args.path.canonicalize()?,
+            path: args.path.canonicalize()?,
             args,
         })
     }
@@ -39,8 +39,8 @@ impl Viewer {
         debouncer.watcher().watch(dir, RecursiveMode::Recursive)?;
 
         for mut events in receiver.iter().flatten() {
-            if self.watch_path.is_file() {
-                events.retain(|event| event.path == self.watch_path);
+            if self.path.is_file() {
+                events.retain(|event| event.path == self.path);
             }
 
             if !events.is_empty() {
@@ -52,10 +52,10 @@ impl Viewer {
     }
 
     fn watch_dir(&self) -> Result<&Path> {
-        if self.watch_path.is_dir() {
-            Ok(&self.watch_path)
+        if self.path.is_dir() {
+            Ok(&self.path)
         } else {
-            self.watch_path.parent().ok_or(Error::NoParentDirectory)
+            self.path.parent().ok_or(Error::NoParentDirectory)
         }
     }
 
@@ -106,23 +106,23 @@ mod tests {
 
     #[test]
     fn constructs() -> Result<()> {
-        let viewer = Viewer::new(args(file!())?);
+        let watcher = Watcher::new(args(file!())?);
 
-        assert!(viewer.is_ok());
+        assert!(watcher.is_ok());
 
         Ok(())
     }
 
     #[test]
     fn handles_event() -> Result<()> {
-        let mut viewer = Viewer::new(args(file!())?)?;
+        let mut watcher = Watcher::new(args(file!())?)?;
 
         let event = DebouncedEvent {
             path: PathBuf::from(file!()),
             kind: DebouncedEventKind::Any,
         };
 
-        assert!(viewer.handle(vec![event]).is_ok());
+        assert!(watcher.handle(vec![event]).is_ok());
 
         Ok(())
     }

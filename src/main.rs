@@ -2,19 +2,19 @@ mod args;
 mod error;
 mod printer;
 mod terminal;
-mod viewer;
+mod watcher;
 
 pub use self::error::{Error, Result};
 
 use args::Args;
 use clap::Parser;
-use viewer::Viewer;
+use watcher::Watcher;
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let mut viewer = Viewer::new(args)?;
+    let mut watcher = Watcher::new(args)?;
 
-    match viewer.run() {
+    match watcher.run() {
         Ok(()) => {}
         Err(error) => eprintln!("tekst: {error:#}"),
     }
