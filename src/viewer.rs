@@ -1,8 +1,6 @@
 mod buffer;
 
-use crate::{args::Args, terminal::Terminal, Error, Result};
-use colored::Colorize;
-
+use crate::{args::Args, printer::Printer, terminal::Terminal, Error, Result};
 use buffer::Buffer;
 use notify_debouncer_mini::{new_debouncer, notify::RecursiveMode, DebouncedEvent};
 use std::{
@@ -77,29 +75,13 @@ impl Viewer {
             let data = buffer.data();
 
             if self.args.diff {
-                Self::print_diff(&old, data);
+                Printer::diff(&old, data);
             } else {
-                Self::print(data);
+                Printer::print(data);
             }
         }
 
         Ok(())
-    }
-
-    fn print_diff(old: &str, new: &str) {
-        for diff in diff::lines(old, new) {
-            let result = match diff {
-                diff::Result::Left(l) => format!("-{l}").bright_red(),
-                diff::Result::Both(l, _) => l.normal(),
-                diff::Result::Right(r) => format!("+{r}").bright_green(),
-            };
-
-            println!("{result}");
-        }
-    }
-
-    fn print(data: &str) {
-        println!("{data}");
     }
 }
 

@@ -1,5 +1,6 @@
 mod args;
 mod error;
+mod printer;
 mod terminal;
 mod viewer;
 
